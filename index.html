@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        font-family: "Roboto", sans-serif;
+        padding: 60px;
+        color: #333;
+      }
+      .image-gallery {
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+      img {
+        width: 300px;
+        height: 300px;
+      }
+      .bell-image {
+        width: 450px;
+        height: 450px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Colorizing the Prokudin-Gorskii photo collection</h1>
+
+    <div>
+      <h2>Project Overview</h2>
+      <p>
+        In this project, the goal was to align digitized versions of
+        Prokudin-Gorskii glass plate images by splitting and aligning the three
+        color channels (red, green, and blue) to create a composite color image.
+        Multiple alignment techniques, including SSD (Sum of Squared
+        Differences) and NCC (Normalized Cross Correlation), were explored for
+        both TIF and JPG images. For JPG images, an extensive search method was
+        used to find the optimal alignment. For TIF images, a pyramid approach
+        was implemented to handle the larger size and complexity more
+        efficiently. To further enhance the alignment results for `emir.tif`,
+        image filtering techniques like Sobel were applied to minimize visual
+        artifacts and improve accuracy.
+      </p>
+    </div>
+
+    <div>
+      <h2>1. Single-scale Implementation for JPG Images</h2>
+      <p>
+        Approach: To enhance the accuracy of image processing, I converted the
+        images to a [0, 1] range using <code>sk.img_as_float</code>. I
+        experimented with both SSD (Sum of Squared Differences) and NCC
+        (Normalized Cross Correlation) for image alignment, and both yielded
+        similar results. An extensive search method was used to find the best
+        alignment due to the relatively smaller size of the JPG images.
+      </p>
+    </div>
+
+    <div>
+      <h2>SSD (Sum of Squared Differences)</h2>
+      <p>
+        While using SSD for alignment, I used Euclidean Distance squared as the
+        metric. I needed to negate the result, as larger values indicate worse
+        alignment (i.e., larger differences between images), whereas smaller
+        values suggest better alignment.
+      </p>
+      <h2>NCC (Normalized Cross-Correlation)</h2>
+      <p>
+        For NCC, I computed the similarity between images by normalizing them
+        and calculating the dot product of the flattened, normalized images.
+        This approach measures how well the images align by comparing their
+        normalized pixel values, with higher values indicating better alignment.
+      </p>
+
+      <div class="image-gallery">
+        <div class="image-tile">
+          <div class="image-item">
+            <h3>Cathedral - SSD</h3>
+            <div>G shift: [5, 2], R shift: [12, 3]</div>
+            <img src="colored_jpg_ssd/cathedral.jpg" />
+          </div>
+          <div class="image-item">
+            <h3>Cathedral - NCC</h3>
+            <div>G shift: [5, 2], R shift: [12, 3]</div>
+            <img src="colored_jpg_ncc/cathedral.jpg" />
+          </div>
+        </div>
+        <div class="image-tile">
+          <div class="image-item">
+            <h3>Monastery - SSD</h3>
+            <div>G shift: [-3, 2], R shift: [3, 2]</div>
+            <img src="colored_jpg_ssd/monastery.jpg" alt="Monastery" />
+          </div>
+          <div class="image-item">
+            <h3>Monastery - NCC</h3>
+            <div>G shift: [-3, 2], R shift: [3, 2]</div>
+            <img src="colored_jpg_ncc/monastery.jpg" alt="Monastery" />
+          </div>
+        </div>
+        <div class="image-tile">
+          <div class="image-item">
+            <h3>Tobolsk - SSD</h3>
+            <div>G shift: [3, 3], R shift: [6, 3]</div>
+            <img src="colored_jpg_ssd/tobolsk.jpg" alt="Tobolsk" />
+          </div>
+          <div class="image-item">
+            <h3>Tobolsk - NCC</h3>
+            <div>G shift: [3, 3], R shift: [6, 3]</div>
+            <img src="colored_jpg_ncc/tobolsk.jpg" alt="Tobolsk" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h2>2. Multi-scale Pyramid Implementation for TIF Images</h2>
+      <p>
+        Approach: For TIF images, I implemented a multi-scale pyramid approach
+        to efficiently align the images despite their larger size and
+        complexity. The pyramid approach allows for progressively finer
+        alignment by analyzing images at different scales. However, the initial
+        results for `emir.tif` were not satisfactory. To address this, I
+        incorporated Sobel edge detection to improve alignment accuracy.
+      </p>
+      <div class="image-gallery">
+        <div class="image-item">
+          <h3>Church</h3>
+          <div>G shift: [25 4], R shift: [58 -4]</div>
+          <img src="colored_tir_ssd/church.jpg" />
+        </div>
+        <div class="image-item">
+          <h3>Emir</h3>
+          <div>G shift: [49, 24], R shift: [72, 43]</div>
+          <img src="colored_tir_ssd/emir.jpg" />
+        </div>
+        <div class="image-item">
+          <h3>Harvesters</h3>
+          <div>G shift: [60, 16], R shift: [124, 14]</div>
+          <img src="colored_tir_ssd/harvesters.jpg" />
+        </div>
+        <div class="image-item">
+          <h3>Icon</h3>
+          <div>G shift: [41, 17], R shift: [90, 23]</div>
+          <img src="colored_tir_ssd/icon.jpg" />
+        </div>
+        <div class="image-item">
+          <h3>Lady</h3>
+          <div>G shift: [52, 9], R shift: [112, 12]</div>
+          <img src="colored_tir_ssd/lady.jpg" />
+        </div>
+        <div class="image-item">
+          <h3>Melons</h3>
+          <div>G shift: [82 10], R shift: [178, 13]</div>
+          <img src="colored_tir_ssd/melons.jpg" />
+        </div>
+        <div class="image-item">
+          <h3>Onion Church</h3>
+          <div>G shift: [52, 26], R shift: [108, 36]</div>
+          <img src="colored_tir_ssd/onion_church.jpg" />
+        </div>
+        <div class="image-item">
+          <h3>Sculpture</h3>
+          <div>G shift: [33, -11], R shift: [140, -27]</div>
+          <img src="colored_tir_ssd/sculpture.jpg" />
+        </div>
+        <div class="image-item">
+          <h3>Self Portrait</h3>
+          <div>G shift: [176, 29], R shift: [176, 37]</div>
+          <img src="colored_tir_ssd/self_portrait.jpg" />
+        </div>
+        <div class="image-item">
+          <h3>Three Generations</h3>
+          <div>G shift: [53, 14], R shift: [122, 11]</div>
+          <img src="colored_tir_ssd/three_generations.jpg" />
+        </div>
+        <div class="image-item">
+          <h3>Train</h3>
+          <div>G shift: [42, 6], R shift: [87, 32]</div>
+          <img src="colored_tir_ssd/train.jpg" />
+        </div>
+      </div>
+    </div>
+    <div>
+      <h2>3. Bells & Whistles (Extra Credit)</h2>
+      <p>
+        Although most of the images aligned really well, emir.tif was not
+        aligned perfectly. To address this, I implemented the Sobel filter. The
+        Sobel filter is an edge detection algorithm that highlights edges in an
+        image by calculating the gradient of pixel intensities. This helps in
+        refining the alignment by focusing on the prominent edges, leading to a
+        more accurate composite image.
+      </p>
+      <div class="image-gallery">
+        <div class="image-item">
+          <h3>Emir</h3>
+          <div>G shift: [49, 24], R shift: [72, 43]</div>
+          <img src="colored_tir_ssd/emir.jpg" class="bell-image" />
+        </div>
+        <div class="image-item">
+          <h3>Emir with Sobel</h3>
+          <div>G shift: [49, 24], R shift: [107, 40]</div>
+          <img src="colored_sobel/emir.jpg" class="bell-image" />
+        </div>
+      </div>
+    </div>
+    <div>
+      <h2>4. Additional image</h2>
+      <p>
+        A few examples of my own choosing from
+        (https://www.loc.gov/collections/prokudin-gorskii/?st=grid)
+      </p>
+      <div class="image-gallery">
+        <div class="image-item">
+          <h3>Women in traditional dress - extensive search SSD</h3>
+          <div>G shift: [3, 1], R shift: [8, 4]</div>
+          <img
+            src="choosed_colored_jpg_ssd/Woman_in_traditional_dress.jpg"
+            class="bell-image"
+          />
+        </div>
+        <div class="image-item">
+          <h3>Tree - extensive search SSD</h3>
+          <div>G shift: [5, 4], R shift: [11, 6]</div>
+          <img src="choosed_colored_jpg_ssd/tree.jpg" class="bell-image" />
+        </div>
+        <div class="image-item">
+          <h3>Embroidered Cloth - pyramid + sobel</h3>
+          <div>G shift: [75, 9], R shift: [158, 16]</div>
+          <img
+            src="choosed_colored_sobel/embroidered_cloth.jpg"
+            class="bell-image"
+          />
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
